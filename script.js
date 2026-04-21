@@ -1,4 +1,4 @@
-function sendMessage() {
+async function sendMessage() {
   let input = document.getElementById("user-input");
   let message = input.value;
  
@@ -6,12 +6,19 @@ function sendMessage() {
  
   addMessage(message, "user");
  
-  let response = getBotResponse(message);
-  setTimeout(() => {
-    addMessage(response, "bot");
-  }, 500);
- 
   input.value = "";
+ 
+  let response = await fetch("http://localhost:5000/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message: message })
+  });
+ 
+  let data = await response.json();
+ 
+  addMessage(data.reply, "bot");
 }
  
 function addMessage(text, sender) {
@@ -23,16 +30,5 @@ function addMessage(text, sender) {
  
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
-}
- 
-function getBotResponse(input) {
-  input = input.toLowerCase();
- 
-  if (input.includes("hello")) return "Hi there!";
-  if (input.includes("how are you")) return "I'm just a bot, but I'm good!";
-  if (input.includes("your name")) return "I'm your simple chatbot 🤖";
-  if (input.includes("bye")) return "Goodbye! Take care 👋";
- 
-  return "Sorry, I don't understand that.";
 }
  
